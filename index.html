@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Google Sheets Data on Web</title>
+	<style>
+		table {
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		th, td {
+			padding: 8px;
+			text-align: left;
+			border-bottom: 1px solid #ddd;
+		}
+
+		th {
+			background-color: #f2f2f2;
+		}
+	</style>
+</head>
+<body>
+	<table id="myTable">
+		<thead>
+			<tr>
+				<!-- <th>Column 1</th>
+				<th>Column 2</th>
+				<th>Column 3</th>
+				<th>Column 4</th> -->
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<script>
+		// fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vS0kA0qw_m-8hzy5M9-Mcjw2_jv8uVhJHYzniD0uaDAJ9s_LHW085GGAL63Y_Cko2Ky1ALRhCWD98ah/pub?output=csv")
+		// 	.then(response => response.text())
+		// 	.then(data => {
+		// 		console.log(data);
+		// 		let tableData = "";
+		// 		let rows = data.split("\n");
+		// 		rows.forEach(row => {
+		// 			let cells = row.split(",");
+		// 			tableData += "<tr>";
+		// 			cells.forEach(cell => {
+		// 				tableData += "<td>" + cell + "</td>";
+		// 			});
+		// 			tableData += "</tr>";
+		// 		});
+		// 		document.getElementById("myTable").querySelector("tbody").innerHTML = tableData;
+		// 	});
+
+        async function fetchData() {
+            try {
+				//A1 https://docs.google.com/spreadsheets/d/e/2PACX-1vQLJPrez-rM-V01m-p8fnOj4IKILw22z_Pkia2bQ3kR-lI2fkMwsdJ5LKK2K8DlLA/pub?output=csv
+				// https://docs.google.com/spreadsheets/d/e/2PACX-1vS0kA0qw_m-8hzy5M9-Mcjw2_jv8uVhJHYzniD0uaDAJ9s_LHW085GGAL63Y_Cko2Ky1ALRhCWD98ah/pub?gid=0&single=true&output=csv
+                const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTB1jpnv7KFXxbX_oVCmLU85GZVzlv_8bChciD3ipAwD-5CQnnWkon6w7d0MddZIBk1dxI-lbZY4oZg/pub?output=csv');
+                const dataInText = await response.text();
+				console.log(dataInText);
+                let tableData = "";
+                let data = dataInText.split("\n")
+                // let rows = data.slice(1, );
+                // console.log(rows);
+                data.forEach( row => {
+                    let cells = row.split(",");
+                    console.log(cells);
+					let arr = [];
+
+					for(let i = 0; i<cells.length; i++){
+						if(cells[i].includes('"')){
+							let leftValue = cells[i].replace('"', '');
+							let rightValue = cells[i+1].replace('"', '');
+							let concateValue = leftValue.concat(", ", rightValue);
+							arr.push(concateValue);
+							i = i+1;
+							console.log(concateValue);
+						} else {
+							arr.push(cells[i]);
+						}
+					}
+					console.log(arr);
+
+                    tableData += "<tr>";
+                        arr.forEach( cell => {
+							console.log(cell.includes('"'));
+                            tableData += "<td>" + cell + "</td>";
+                        });
+                    tableData += "</tr>";
+                });
+                document.getElementById("myTable").querySelector("tbody").innerHTML = tableData;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        fetchData();
+
+	</script>
+</body>
+</html>
